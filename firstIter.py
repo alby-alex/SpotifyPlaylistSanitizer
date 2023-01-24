@@ -1,16 +1,17 @@
 import tekore as tk
 
-client_id = '028a0cf47362411fb1eeb6c9ace76ad9'
-client_secret = 'f734389c17094d4c99f7e7383bfb741e'
+conf = tk.config_from_file('tekore.cfg', return_refresh=True)
+user_token = tk.refresh_user_token(*conf[:2], conf[3])
 
-redirect_uri = "https://example.com/callback"
-user_token = tk.prompt_for_user_token(
-    client_id,
-    client_secret,
-    redirect_uri,
-    scope=tk.scope.every
-)
-conf = (client_id, client_secret, redirect_uri, user_token.refresh_token)
-tk.config_to_file('tekore.cfg', conf)
+spotify = tk.Spotify(user_token)
 
 
+
+playlist = spotify.playlist("4TEfGWKFu6u9b7pwZNd2oM")
+
+new_playlist = spotify.playlist_create(spotify.current_user().id, "{} (clean)".format(playlist.name)).id
+
+for i in playlist.tracks.items:
+    if not i.track.explicit:
+        spotify.playlist_add(new_playlist, [i.track.uri])
+    # print(i.track)
